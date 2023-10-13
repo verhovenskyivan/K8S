@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: my-pod
+  name: my-pod-http
+spec:
+  replicas: 3
+  containers:
+  - name: containername
+    image: k8s.gcr.io/liveness
+    args:
+    - /server
+    readinessProbe:
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 5
+  periodSeconds: 5
