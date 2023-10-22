@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-autoscaler
+  labels:
+    app: myapp-k8s-autoscaler
+    env: prod
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myapp-pod-as
+  template:
+    metadata:
+      labels:
+        app: myapp-pod-as
+    spec:
+      containers:
+      - name: myapp-container
+        image: nginx
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myapp-autoscaler
+spec:
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: myapp-autoscaler
+    minReplicas: 2
+    maxReplicas: 4
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target: 
+          type: Utilization
+          averageUtilization: 80
