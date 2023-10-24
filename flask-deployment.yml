@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main
+  namespace: Flask-Prod
+spec:
+  selector:
+    matchLabels:
+      app: main
+      env: prod
+  template:
+    metadata:
+      labels:
+        project: flask
+    spec:
+      containers:
+      - name: myapp
+        image: gitlab.com/verhovensky/flask
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myapp
+spec:
+  selector:
+    env: prod
+    app: main
+  template:
+    metadata:
+      labels:
+        project: flask
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: myapp
+  minReplicas: 4
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+        MaxUtilizations: 80
