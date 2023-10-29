@@ -1,0 +1,5 @@
+container:
+  image: registry.gitlab.com/verhovensky/helm
+  containerPort: 8080
+
+replicaCount: 3
