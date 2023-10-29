@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-MyFlask
+  labels:
+      env: prod
+      app: {{.Release.Name}}-MyFlask
+spec:
+  replicas: {{.values.replicaCount}}
+  selector:
+    matchLabels:
+    env: prod
+    app: {{.Release.Name}}-MyFlask
+  template:
+    metadata:
+      labels:
+        env: prod
+        app: {{.Release.Name}}-MyFlask
+    spec:
+      containers:
+      - name: myapp
+        image: {{.values.container.image}}
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: {{.values.container.containerPort}}
